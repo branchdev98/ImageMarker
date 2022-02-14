@@ -79,7 +79,7 @@ let pen_number=1;
                 
                 
                 xmlcontent = this.response;
-                var arrayTags = ["documents", "point"];
+                var arrayTags = ["drawing", "image", "point"];
                 point_array=  parseXml(xmlcontent, arrayTags);
                 redraw();
                 //xmltoarray(xmlcontent);        
@@ -126,7 +126,7 @@ let pen_number=1;
         let result = {};
         for (let node of dom.childNodes) parseNode(node, result);
         
-        return result.documents[0].point;
+        return result.drawing[0].point;
     }
 
   
@@ -223,15 +223,15 @@ function save(){
   
 }
 function toXML(point_array){
-    var toXml  = "<documents>";
-
+    var toXml  = "<drawing>";
+    var filename = document.getElementById("filename").getAttribute('value');
  toXml = (point_array) => {
     return point_array.reduce((result, el) => {
      return result + `<point number="${el.number}" x="${el.x}" y="${el.y}" size="${el.size}"></point>\n`
     }, '')
   }
-  toXML += "</documents>";
-  return "<documents>" + toXml(point_array);
+  
+  return "<drawing>\n<image>\n" + filename + "\n</image>\n"  + toXml(point_array) + "</drawing>";
 }
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
