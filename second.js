@@ -1,7 +1,6 @@
 var img_width, img_height;
-let number = 1;
 let point_array=[];
- 
+let pen_number=1;
     let myImg = document.querySelector("#blah");
     var canvas = document.getElementById("imgCanvas");
     var load = function(e){
@@ -15,10 +14,10 @@ let point_array=[];
     document.addEventListener('DOMContentLoaded',function() {
         document.querySelector("#pen_number").onchange=loadedit;
     },false);
-    let pen_number=1;
+   
    var loadedit = function(e){
     pen_number = parseInt(document.getElementById("pen_number").value);
-   // pen_number++;
+   
    }
     canvas.style.position = "absolute";
    
@@ -48,7 +47,7 @@ let point_array=[];
       //  cursor_ctx.fillStyle = color;
       
           cursor_ctx.arc( rad / 2, rad / 2, rad / 2, 0, Math.PI * 2 );
-     
+        
       cursor_ctx.strokeStyle=color;
         cursor_ctx.stroke();
         // extract it as a png image
@@ -159,17 +158,44 @@ function draw(event) {
     posx = pos.x;
     posy = pos.y;
    
+   
     
 
    
     const point = {number: pen_number, x: posx, y: posy, size: pen_style.radius};
-    point_array.push(point);
-    drawCircle(context, point );
-    
+    if (document.getElementById("method").value == "draw")
+    {
+        point_array.push(point);    //add current point to array of point
+        drawCircle(context, point );    //draw current point
+        pen_number++;                   //increase number to draw , it is next number
+        var pen_number_edit =  document.getElementById("pen_number1");  //change value of pen_number_value
+        pen_number_edit.setAttribute("value", pen_number);  //
+    }
+    else
+    {
+        var min_dist = 100000;
+        var min_index = -1;
+        for (var i=0; i<point_array.length; i++){
+            var dist = Math.pow(Math.pow(point.x - point_array[i].x, 2) + Math.pow(point.y - point_array[i].y, 2), 0.5);
+            if (min_dist > dist)
+            {
+                    min_dist = dist;
+                    min_index = i;
+                    
+            }
+        }
+        console.log(min_index);
+        if (min_index>-1)
+        {
+        point_array.splice(min_index, 1); 
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        redraw();
+        //save();
+        //location.reload();
+        }
 
-    pen_number++;
-    var pen_number_edit =  document.getElementById("pen_number1");
-    pen_number_edit.setAttribute("value", pen_number);
+    }
+
    
 }
 
@@ -190,16 +216,10 @@ function save(){
         if (this.readyState == 4 && this.status == 200) {
             if (this.responseText == "success")
                 alert("successfully saved xml file");
-            //console.log(this.responseText);
+            
         }
     }
-    // Sending our request 
-    
-
-
-
-    //file_put_contents($xmlfilename, $content); //write to file
-  
+ 
   
 }
 function toXML(point_array){
@@ -214,9 +234,9 @@ function toXML(point_array){
   return "<documents>" + toXml(point_array);
 }
 function getMousePos(canvas, evt) {
-var rect = canvas.getBoundingClientRect();
-return {
-  x: evt.clientX - rect.left,
-  y: evt.clientY - rect.top
-};
+    var rect = canvas.getBoundingClientRect();
+    return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+    };
 }
